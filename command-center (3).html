@@ -1,0 +1,1862 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Command Center" />
+<meta name="theme-color" content="#f4efe6" />
+<title>Command Center — Hendrickson</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='%23f4efe6'/><text x='90' y='118' font-family='Georgia,serif' font-style='italic' font-size='100' fill='%2315243a' text-anchor='middle'>H</text><circle cx='140' cy='50' r='8' fill='%23b88a3e'/></svg>" />
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23f4efe6'/><text x='16' y='22' font-family='Georgia,serif' font-style='italic' font-size='18' fill='%2315243a' text-anchor='middle'>H</text></svg>" />
+<link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkhlbmRyaWNrc29uIENvbW1hbmQgQ2VudGVyIiwKICAic2hvcnRfbmFtZSI6ICJDb21tYW5kIENlbnRlciIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZjRlZmU2IiwKICAidGhlbWVfY29sb3IiOiAiI2Y0ZWZlNiIKfQ==" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f4efe6;
+    --paper-2: #ebe3d4;
+    --ink: #15243a;
+    --ink-soft: #3b4b65;
+    --ink-faint: #7a8496;
+    --gold: #b88a3e;
+    --gold-soft: #d9b56b;
+    --water: #3b7ba8;
+    --water-deep: #1f4d75;
+    --rust: #a84a2b;
+    --leaf: #5a7a3a;
+    --line: rgba(21,36,58,0.16);
+    --line-soft: rgba(21,36,58,0.08);
+    --sun: #e6b84a;
+    --shadow: 0 1px 0 rgba(21,36,58,0.06), 0 8px 24px -12px rgba(21,36,58,0.18);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(184,138,62,0.07), transparent 40%),
+      radial-gradient(circle at 92% 90%, rgba(59,123,168,0.09), transparent 45%);
+    min-height: 100vh;
+  }
+  .noise {
+    position: fixed; inset: 0; pointer-events: none; opacity: 0.35; mix-blend-mode: multiply; z-index: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.08 0 0 0 0 0.14 0 0 0 0 0.22 0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  .wrap {
+    position: relative; z-index: 1;
+    max-width: 1180px; margin: 0 auto; padding: 28px 22px 120px;
+  }
+
+  /* ===== Header ===== */
+  header.masthead {
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 14px;
+    margin-bottom: 22px;
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
+    flex-wrap: wrap;
+  }
+  .masthead .title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(34px, 6vw, 58px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    font-style: italic;
+  }
+  .masthead .title em { font-style: normal; color: var(--gold); }
+  .masthead .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    text-align: right;
+  }
+  .masthead .meta .date { color: var(--ink); font-weight: 500; }
+  .rule { height: 1px; background: var(--ink); margin: 0 0 4px; }
+  .rule.thin { height: 1px; background: var(--line); }
+
+  /* ===== Tabs ===== */
+  nav.tabs {
+    display: flex; gap: 2px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 26px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav.tabs::-webkit-scrollbar { display: none; }
+  nav.tabs button {
+    background: transparent; border: none; cursor: pointer;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 12px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 12px 14px;
+    color: var(--ink-faint);
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color .15s, border-color .15s;
+  }
+  nav.tabs button:hover { color: var(--ink); }
+  nav.tabs button.active {
+    color: var(--ink);
+    border-bottom-color: var(--gold);
+  }
+  nav.tabs button .count {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 2px;
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
+  nav.tabs button.active .count { background: var(--gold); }
+
+  /* ===== Panels ===== */
+  .panel { display: none; animation: fade .25s ease; }
+  .panel.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px);} to { opacity:1; transform:none; } }
+
+  /* ===== Today / Brief ===== */
+  .brief-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 22px;
+  }
+  @media (max-width: 820px) { .brief-grid { grid-template-columns: 1fr; } }
+  .card {
+    background: rgba(255,255,255,0.55);
+    border: 1px solid var(--line);
+    padding: 22px;
+    position: relative;
+    box-shadow: var(--shadow);
+  }
+  .card h2, .card .h {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 1.1;
+    margin: 0 0 14px;
+    letter-spacing: -0.01em;
+  }
+  .card .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+
+  /* Priorities list */
+  .priority-list { list-style: none; padding: 0; margin: 0; }
+  .priority-list li {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 12px 0;
+    border-top: 1px dashed var(--line);
+  }
+  .priority-list li:first-child { border-top: 1px solid var(--ink); }
+  .priority-list li:last-child { border-bottom: 1px solid var(--ink); }
+  .priority-num {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 26px;
+    color: var(--gold);
+    line-height: 1;
+    min-width: 28px;
+  }
+  .priority-body { flex: 1; }
+  .priority-body .t { font-weight: 500; font-size: 15px; }
+  .priority-body .m { font-size: 12px; color: var(--ink-soft); margin-top: 2px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; }
+  .priority-body input[type="text"] {
+    width: 100%; border: none; background: transparent;
+    font-family: inherit; font-size: 15px; font-weight: 500; color: var(--ink);
+    padding: 2px 0; outline: none;
+    border-bottom: 1px dashed transparent;
+  }
+  .priority-body input[type="text"]:focus { border-bottom-color: var(--gold); }
+  .check {
+    width: 18px; height: 18px; border: 1.5px solid var(--ink-soft);
+    border-radius: 2px; margin-top: 3px; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; transition: all .15s;
+  }
+  .check.done { background: var(--ink); border-color: var(--ink); }
+  .check.done::after { content: '✓'; color: var(--paper); font-size: 13px; line-height: 1; }
+  .priority-body.done .t, .priority-body.done input { color: var(--ink-faint); text-decoration: line-through; }
+
+  /* Status strip */
+  .status-strip {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+    border: 1px solid var(--ink);
+    background: var(--paper-2);
+    margin: 22px 0;
+  }
+  .status-strip .cell {
+    padding: 14px 16px;
+    border-right: 1px solid var(--ink);
+  }
+  .status-strip .cell:last-child { border-right: none; }
+  .status-strip .n {
+    font-family: 'Fraunces', serif; font-size: 32px; line-height: 1;
+    font-weight: 500;
+  }
+  .status-strip .l {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--ink-soft); margin-top: 4px;
+  }
+  @media (max-width: 600px) {
+    .status-strip { grid-template-columns: 1fr; }
+    .status-strip .cell { border-right: none; border-bottom: 1px solid var(--ink); }
+    .status-strip .cell:last-child { border-bottom: none; }
+  }
+
+  /* Countdowns */
+  .countdowns { display: flex; flex-direction: column; gap: 10px; }
+  .cd {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .cd:last-child { border-bottom: none; }
+  .cd .label { font-size: 14px; font-weight: 500; }
+  .cd .sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-faint); display: block; margin-top: 2px; }
+  .cd .days {
+    font-family: 'Fraunces', serif; font-size: 22px; font-style: italic;
+    white-space: nowrap;
+  }
+  .cd.urgent .days { color: var(--rust); }
+  .cd.near .days { color: var(--gold); }
+
+  /* Verse / prompt */
+  .verse {
+    border-left: 3px solid var(--gold);
+    padding: 6px 0 6px 16px;
+    margin: 18px 0 0;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink-soft);
+  }
+
+  /* ===== Generic sections ===== */
+  h1.section {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 34px;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+  }
+  .section-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-faint);
+    margin-bottom: 22px;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 820px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* Task lists (editable) */
+  .tasklist { list-style: none; padding: 0; margin: 8px 0 0; }
+  .tasklist li {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 9px 0;
+    border-top: 1px solid var(--line-soft);
+  }
+  .tasklist li:first-child { border-top: 1px solid var(--line); }
+  .tasklist .tcontent { flex: 1; min-width: 0; }
+  .tasklist input.ttext {
+    width: 100%; border: none; background: transparent;
+    font-family: inherit; font-size: 14px; color: var(--ink);
+    padding: 1px 0; outline: none;
+    border-bottom: 1px dashed transparent;
+  }
+  .tasklist input.ttext:focus { border-bottom-color: var(--gold); }
+  .tasklist .tmeta {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--ink-faint); margin-top: 2px;
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+  .tasklist .tmeta select, .tasklist .tmeta input[type="date"] {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    border: none; background: transparent; color: var(--ink-soft);
+    padding: 0; cursor: pointer;
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .tasklist .tmeta select:focus, .tasklist .tmeta input[type="date"]:focus { outline: none; color: var(--ink); }
+  .tasklist .done input.ttext { color: var(--ink-faint); text-decoration: line-through; }
+  .tasklist .tx {
+    background: none; border: none; color: var(--ink-faint); cursor: pointer;
+    font-size: 16px; padding: 0 4px; opacity: 0; transition: opacity .15s;
+  }
+  .tasklist li:hover .tx { opacity: 1; }
+  .tasklist .tx:hover { color: var(--rust); }
+
+  /* Priority pills */
+  .pill {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border: 1px solid currentColor;
+  }
+  .pill.p1 { color: var(--rust); }
+  .pill.p2 { color: var(--gold); }
+  .pill.p3 { color: var(--water); }
+  .pill.done { color: var(--leaf); }
+
+  /* Add row */
+  .addrow {
+    display: flex; gap: 8px; margin-top: 12px;
+    padding-top: 12px; border-top: 1px solid var(--line);
+  }
+  .addrow input {
+    flex: 1; border: none; background: var(--paper-2);
+    padding: 8px 10px; font-family: inherit; font-size: 14px; color: var(--ink);
+    outline: none;
+    border: 1px solid transparent;
+  }
+  .addrow input:focus { border-color: var(--gold); }
+  .addrow button {
+    background: var(--ink); color: var(--paper);
+    border: none; padding: 8px 14px; cursor: pointer;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.12em;
+  }
+  .addrow button:hover { background: var(--water-deep); }
+
+  /* Tag / area chip */
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 3px 8px;
+    background: var(--paper-2);
+    color: var(--ink-soft);
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .chip.active {
+    background: var(--ink); color: var(--paper);
+  }
+
+  /* Brain dump */
+  .brain textarea {
+    width: 100%; min-height: 120px;
+    background: var(--paper-2); border: 1px solid var(--line);
+    padding: 14px; font-family: inherit; font-size: 14px; color: var(--ink);
+    resize: vertical; outline: none;
+    font-family: 'Fraunces', serif; font-style: italic;
+  }
+  .brain textarea:focus { border-color: var(--gold); }
+  .brain-log { margin-top: 14px; }
+  .brain-entry {
+    border-top: 1px dashed var(--line);
+    padding: 10px 0;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    position: relative;
+  }
+  .brain-entry .stamp {
+    font-family: 'JetBrains Mono', monospace; font-style: normal;
+    font-size: 9px; text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--ink-faint); margin-bottom: 2px;
+    display: flex; justify-content: space-between;
+  }
+  .brain-entry .del {
+    background: none; border: none; cursor: pointer;
+    color: var(--ink-faint); font-size: 12px;
+  }
+  .brain-entry .del:hover { color: var(--rust); }
+
+  /* Morning brief block */
+  .brief-output {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    margin-top: 14px;
+    position: relative;
+    max-height: 420px;
+    overflow-y: auto;
+  }
+  .brief-output .copybtn {
+    position: absolute; top: 12px; right: 12px;
+    background: var(--gold); color: var(--ink);
+    border: none; padding: 6px 10px; cursor: pointer;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.12em;
+  }
+  .brief-output .copybtn:hover { background: var(--gold-soft); }
+
+  /* Weekly sparkline grid */
+  .weekgrid {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 4px; margin-top: 10px;
+  }
+  .weekgrid .day {
+    aspect-ratio: 1;
+    background: var(--paper-2);
+    border: 1px solid var(--line-soft);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    cursor: pointer;
+    position: relative;
+  }
+  .weekgrid .day .dn { font-family: 'Fraunces', serif; font-size: 14px; color: var(--ink); margin-top: 2px; }
+  .weekgrid .day.hit { background: var(--leaf); color: var(--paper); }
+  .weekgrid .day.hit .dn { color: var(--paper); }
+  .weekgrid .day.today { border: 2px solid var(--gold); }
+
+  /* Mini util */
+  .muted { color: var(--ink-faint); font-size: 12px; }
+  .row-between { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .btn-ghost {
+    background: transparent; border: 1px solid var(--ink);
+    color: var(--ink); padding: 7px 12px; cursor: pointer;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.12em;
+  }
+  .btn-ghost:hover { background: var(--ink); color: var(--paper); }
+
+  /* Filter bar */
+  .filterbar {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin: 14px 0;
+    padding: 10px 0;
+    border-top: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .filterbar .flabel {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--ink-faint); margin-right: 6px; align-self: center;
+  }
+
+  /* Footer */
+  footer.foot {
+    margin-top: 48px;
+    padding-top: 14px;
+    border-top: 1px solid var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--ink-faint);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+
+  /* Area headers on "all tasks" */
+  .area-head {
+    font-family: 'Fraunces', serif;
+    font-weight: 500; font-size: 20px;
+    margin: 22px 0 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--ink);
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .area-head .c { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-faint); letter-spacing: 0.14em; }
+
+  /* ===== Mobile-specific tweaks ===== */
+  @media (max-width: 600px) {
+    body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+    .wrap { padding: 16px 14px 80px; }
+    .masthead .title { font-size: 32px; }
+    .masthead .meta { text-align: left; }
+    nav.tabs { margin-bottom: 18px; }
+    nav.tabs button { padding: 14px 12px; font-size: 13px; min-height: 44px; }
+    .card { padding: 16px; }
+    .card h2, .card .h { font-size: 19px; }
+    h1.section { font-size: 28px; }
+    .check { width: 24px; height: 24px; }
+    .priority-list li { padding: 14px 0; }
+    .priority-num { font-size: 22px; }
+    .priority-body input[type="text"] { font-size: 16px; min-height: 28px; }
+    .tasklist li { padding: 12px 0; }
+    .tasklist input.ttext { font-size: 15px; min-height: 26px; padding: 4px 0; }
+    .tasklist .tx { opacity: 1; padding: 6px 10px; font-size: 18px; }
+    .addrow input { font-size: 15px; padding: 12px 10px; }
+    .addrow button { padding: 12px 16px; }
+    .btn-ghost { padding: 10px 14px; font-size: 11px; min-height: 40px; }
+    .brain textarea { font-size: 16px; min-height: 100px; }
+    .brief-output { font-size: 12px; padding: 18px; }
+    .filterbar { gap: 8px; }
+    .chip { padding: 8px 12px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <div class="title">The <em>Daily</em> Hendrickson</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.18em;color:var(--ink-faint);margin-top:6px;">Samantha · Cody · L · A · E</div>
+    </div>
+    <div class="meta">
+      <div class="date" id="today-date" style="font-size:13px;font-weight:600;color:var(--ink);letter-spacing:0.08em;">—</div>
+      <div id="today-date-short" style="font-family:'Fraunces',serif;font-style:italic;font-size:22px;color:var(--gold);text-transform:none;letter-spacing:-0.01em;margin-top:2px;">—</div>
+      <div style="margin-top:4px;">Est. 2026 · Vol. I · No. <span id="day-num">1</span></div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="today" class="active">Today</button>
+    <button data-tab="week">This Week</button>
+    <button data-tab="areas">Life Areas</button>
+    <button data-tab="brain">Brain Dump <span class="count" id="brain-count">0</span></button>
+    <button data-tab="optimizers">Optimizers <span class="count" id="opt-count">0</span></button>
+    <button data-tab="sunday">Sunday Sweep</button>
+    <button data-tab="habits">Rituals</button>
+    <button data-tab="deadlines">Deadlines</button>
+    <button data-tab="brief">Morning Brief</button>
+  </nav>
+
+  <!-- =================== TODAY =================== -->
+  <section class="panel active" id="panel-today">
+    <div class="row-between" style="margin-bottom:18px;">
+      <div>
+        <h1 class="section">Today</h1>
+        <div class="section-sub">Top 3 · Everything else is noise</div>
+      </div>
+      <button class="btn-ghost" id="reset-today">Reset Today</button>
+    </div>
+
+    <div class="brief-grid">
+      <div>
+        <div class="card">
+          <div class="kicker">The Three</div>
+          <h2 class="h">What moves the needle today</h2>
+          <ul class="priority-list" id="priorities"></ul>
+          <p class="muted" style="margin-top:12px;">Tap a line to edit · Check it off when done</p>
+        </div>
+
+        <div class="status-strip">
+          <div class="cell">
+            <div class="n" id="s-done">0/3</div>
+            <div class="l">Priorities done</div>
+          </div>
+          <div class="cell">
+            <div class="n" id="s-week">0</div>
+            <div class="l">Tasks this week</div>
+          </div>
+          <div class="cell">
+            <div class="n" id="s-brain">0</div>
+            <div class="l">In brain dump</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="kicker">One thing I'm avoiding</div>
+          <input id="avoiding" type="text" placeholder="Name it. That's half the work." style="width:100%; border:none; background:transparent; border-bottom:1px dashed var(--line); font-family:'Fraunces',serif; font-style:italic; font-size:18px; padding:8px 0; color:var(--ink); outline:none;" />
+        </div>
+
+        <div class="card" style="margin-top:22px;">
+          <div class="kicker">Yesterday's Win</div>
+          <input id="win" type="text" placeholder="Even a small one counts." style="width:100%; border:none; background:transparent; border-bottom:1px dashed var(--line); font-family:'Fraunces',serif; font-style:italic; font-size:18px; padding:8px 0; color:var(--ink); outline:none;" />
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="border-left: 3px solid var(--gold);">
+          <div class="kicker">The Why</div>
+          <h2 class="h" style="color: var(--gold);">⌂ Home for the kids</h2>
+          <p style="font-family:'Fraunces',serif;font-style:italic;font-size:15px;color:var(--ink-soft);margin:8px 0 14px;line-height:1.5;">
+            L. A. E. Six summers left with L. The house E will remember.
+          </p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-soft);">
+            <div>
+              <div style="font-family:'Fraunces',serif;font-size:18px;color:var(--ink);text-transform:none;letter-spacing:0;">$800K</div>
+              <div>Down payment</div>
+            </div>
+            <div>
+              <div style="font-family:'Fraunces',serif;font-size:18px;color:var(--ink);text-transform:none;letter-spacing:0;">740+</div>
+              <div>FICO target</div>
+            </div>
+            <div>
+              <div style="font-family:'Fraunces',serif;font-size:18px;color:var(--ink);text-transform:none;letter-spacing:0;">$1M+</div>
+              <div>Doc'd income/yr</div>
+            </div>
+            <div>
+              <div style="font-family:'Fraunces',serif;font-size:18px;color:var(--rust);text-transform:none;letter-spacing:0;">$20K</div>
+              <div>Liquid (below floor)</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--ink-faint);border-top:1px dashed var(--line);padding-top:10px;">
+            Sprint target: Jun 2027 (13mo) · adjust as income engines prove out
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:22px;">
+          <div class="kicker">Income Engines · Sprint Math</div>
+          <h2 class="h">$60-65K → ~$83K/mo to qualify</h2>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;color:var(--ink-soft);margin-top:8px;">
+            <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--line);padding:6px 0;">
+              <span>Innovo subscription recovery</span>
+              <span style="color:var(--leaf);">+$11K found</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--line);padding:6px 0;">
+              <span>Innovo delivery reactivation</span>
+              <span style="color:var(--gold);">+$18K/mo target</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--line);padding:6px 0;">
+              <span>Lungo / Luna DFY (10 clients)</span>
+              <span style="color:var(--gold);">+$5-15K/mo MRR</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:6px 0;">
+              <span>Franchise fees (per signed)</span>
+              <span style="color:var(--gold);">lump + royalty</span>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;font-style:italic;color:var(--ink-faint);font-family:'Fraunces',serif;">
+            Numbers update as engines prove out. Don't confuse plan with progress.
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:22px;">
+          <div class="kicker">Countdowns</div>
+          <h2 class="h">What's coming</h2>
+          <div class="countdowns" id="countdowns"></div>
+        </div>
+
+        <div class="card" style="margin-top:22px;">
+          <div class="kicker">Anchor</div>
+          <h2 class="h">A word for today</h2>
+          <div class="verse" id="anchor-verse">—</div>
+          <button class="btn-ghost" style="margin-top:14px;" id="new-verse">New anchor</button>
+        </div>
+
+        <div class="card" style="margin-top:22px;">
+          <div class="kicker">Rituals · Today</div>
+          <h2 class="h">Foundation</h2>
+          <ul class="tasklist" id="today-rituals"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== WEEK =================== -->
+  <section class="panel" id="panel-week">
+    <h1 class="section">This Week</h1>
+    <div class="section-sub">All open tasks across every area · ranked by urgency</div>
+
+    <div class="filterbar" id="week-filter">
+      <span class="flabel">Filter:</span>
+      <span class="chip active" data-filter="all">All</span>
+      <span class="chip" data-filter="p1">P1 Urgent</span>
+      <span class="chip" data-filter="p2">P2 Important</span>
+      <span class="chip" data-filter="p3">P3 Later</span>
+      <span class="chip" data-filter="overdue">Overdue</span>
+      <span class="chip" data-filter="week">Due this week</span>
+    </div>
+
+    <div id="week-body"></div>
+  </section>
+
+  <!-- =================== LIFE AREAS =================== -->
+  <section class="panel" id="panel-areas">
+    <h1 class="section">Life Areas</h1>
+    <div class="section-sub">Every track · one home · add + edit freely</div>
+
+    <div class="filterbar" id="area-tabs"></div>
+    <div id="area-body"></div>
+  </section>
+
+  <!-- =================== BRAIN DUMP =================== -->
+  <section class="panel" id="panel-brain">
+    <h1 class="section">Brain Dump</h1>
+    <div class="section-sub">No structure required · get it out of your head</div>
+
+    <div class="card brain">
+      <div class="kicker">New thought</div>
+      <textarea id="brain-input" placeholder="What's in your head right now? Ideas, worries, random to-dos, questions for Claude, reminders to yourself..."></textarea>
+      <div class="addrow" style="border:none; padding:0; margin-top:10px;">
+        <button id="brain-save" style="flex:0;">Capture</button>
+        <button class="btn-ghost" id="brain-to-task" style="margin-left:auto;">Turn latest into task →</button>
+      </div>
+    </div>
+
+    <div class="brain-log card" style="margin-top:22px;">
+      <div class="kicker">Log</div>
+      <h2 class="h">Everything you've captured</h2>
+      <div id="brain-entries"></div>
+    </div>
+  </section>
+
+  <!-- =================== OPTIMIZERS =================== -->
+  <section class="panel" id="panel-optimizers">
+    <h1 class="section">Optimizers</h1>
+    <div class="section-sub">The cloud of small ideas that aren't tasks · safe place to land them</div>
+
+    <div class="card">
+      <div class="kicker">What goes here</div>
+      <p style="font-family:'Fraunces',serif;font-style:italic;font-size:15px;color:var(--ink-soft);line-height:1.5;">
+        The little voice that says <em>"oh I should also..."</em> mid-task. Optimizations to home, body, schedule, kids, environment. Things that aren't urgent but you don't want to forget. They live here until you're ready to act on them — then turn them into a real task with the → button.
+      </p>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="kicker">Add an optimizer</div>
+      <div class="addrow" style="border:none;padding:0;">
+        <input id="opt-input" placeholder="e.g., switch to glass storage containers, add a bird feeder, look into circadian lighting..." style="font-family:'Fraunces',serif;font-style:italic;" />
+        <select id="opt-tag" style="background:var(--paper-2);border:1px solid var(--line);padding:8px;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-soft);">
+          <option value="biohack">Biohack</option>
+          <option value="meals">Meals</option>
+          <option value="style">Style</option>
+          <option value="family">Family</option>
+          <option value="friends">Friends</option>
+          <option value="body">Body</option>
+          <option value="house">House goal</option>
+          <option value="other">Other</option>
+        </select>
+        <button id="opt-add">Add</button>
+      </div>
+    </div>
+
+    <div id="opt-body" style="margin-top:14px;"></div>
+  </section>
+
+  <!-- =================== SUNDAY SWEEP =================== -->
+  <section class="panel" id="panel-sunday">
+    <h1 class="section">Sunday Sweep</h1>
+    <div class="section-sub">20 minutes · once a week · resets your week</div>
+
+    <div class="card">
+      <div class="kicker">The Sweep</div>
+      <h2 class="h">Walk through this Sunday with coffee</h2>
+      <p class="muted" style="margin-top:6px;">Don't try to do this perfectly. Spend 90 seconds per area max. The goal is to clear the deck, not to plan everything.</p>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="kicker">Step 1 · Brain dump everything</div>
+      <textarea id="sweep-dump" placeholder="What's been rattling around in your head this week? Don't filter. Just dump. Worries, ideas, follow-ups, things you forgot, conversations you need to have. Take 5 min. We'll sort it next." style="width:100%;min-height:140px;background:var(--paper-2);border:1px solid var(--line);padding:14px;font-family:'Fraunces',serif;font-style:italic;font-size:14px;color:var(--ink);resize:vertical;outline:none;"></textarea>
+      <div class="addrow" style="border:none;padding:0;margin-top:10px;">
+        <button id="sweep-save">Save to brain dump</button>
+        <button class="btn-ghost" id="sweep-clear" style="margin-left:auto;">Clear</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="kicker">Step 2 · Area-by-area pulse</div>
+      <h2 class="h">Where is each area at?</h2>
+      <p class="muted">For each area below: write one line. "What's the next move?" If nothing, write "no move" — that's a valid answer.</p>
+      <div id="sweep-areas" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="kicker">Step 3 · Plan the three for Monday</div>
+      <p class="muted" style="margin-bottom:10px;">Now go to the Today tab and write your three. Brain is empty, you can pick clearly.</p>
+      <button class="btn-ghost" id="sweep-go-today">→ Go to Today tab</button>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="kicker">Step 4 · Check the week ahead</div>
+      <p class="muted" style="margin-bottom:10px;">What's the one thing on the calendar this week you might forget about? (Pickup, appointment, deadline, kid event)</p>
+      <input type="text" id="sweep-week-thing" placeholder="The thing I might forget..." style="width:100%;border:none;background:var(--paper-2);padding:10px;font-family:'Fraunces',serif;font-style:italic;font-size:14px;outline:none;border:1px solid transparent;" />
+      <p class="muted" style="margin-top:8px;font-size:11px;">This will be added to your brain dump and surfaced in tomorrow's brief.</p>
+    </div>
+  </section>
+
+  <!-- =================== HABITS =================== -->
+  <section class="panel" id="panel-habits">
+    <h1 class="section">Rituals</h1>
+    <div class="section-sub">Daily foundation · hormone balancing · faith · movement</div>
+
+    <div id="habits-grid"></div>
+
+    <div class="card" style="margin-top:22px;">
+      <div class="kicker">Add Ritual</div>
+      <div class="addrow">
+        <input id="new-habit" placeholder="e.g., 10 min walk after lunch" />
+        <button id="add-habit">Add</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== DEADLINES =================== -->
+  <section class="panel" id="panel-deadlines">
+    <h1 class="section">Deadlines</h1>
+    <div class="section-sub">Fixed dates · non-negotiable anchors</div>
+    <div id="deadlines-body"></div>
+
+    <div class="card" style="margin-top:22px;">
+      <div class="kicker">Add deadline</div>
+      <div class="addrow">
+        <input id="dl-title" placeholder="Title" />
+        <input id="dl-date" type="date" style="flex:0; min-width:150px;" />
+        <button id="dl-add">Add</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== MORNING BRIEF =================== -->
+  <section class="panel" id="panel-brief">
+    <h1 class="section">Morning Brief</h1>
+    <div class="section-sub">Generated from today's data · copy into Lindy, text to yourself, paste anywhere</div>
+
+    <div class="card">
+      <div class="kicker">Your brief · <span id="brief-date"></span></div>
+      <div class="brief-output" id="brief-text">
+        <button class="copybtn" id="copy-brief">Copy</button>
+      </div>
+    </div>
+
+    <p class="muted" style="margin-top:14px;">
+      Refresh this tab any time — it pulls from your priorities, countdowns, rituals, and brain dump log.
+      Works offline. Data is saved locally in your browser so it persists between sessions on this device.
+    </p>
+  </section>
+
+  <footer class="foot">
+    <div>Samantha · Command Center · Local-first</div>
+    <div>
+      <button class="btn-ghost" id="export-data">Export all</button>
+      <button class="btn-ghost" id="import-data">Import</button>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+/* ================================================================
+   STATE MODEL
+   ================================================================ */
+const LS_KEY = 'samantha_command_center_v1';
+
+const DEFAULT_AREAS = [
+  { id: 'house',    name: '$4M Home (The Why)', color: '#b88a3e', emoji: '⌂' },
+  { id: 'move',     name: 'Move (May 17)',     color: '#a84a2b', emoji: '⬢' },
+  { id: 'luna',     name: 'Luna / Bridge Build', color: '#1f4d75', emoji: '◐' },
+  { id: 'innovo',   name: 'Innovo Spa (Ops + Revenue)',  color: '#3b7ba8', emoji: '◆' },
+  { id: 'lungo',    name: 'Lungo (AI Agency)', color: '#15243a', emoji: '◼' },
+  { id: 'franchise',name: 'Franchise Dev',     color: '#b88a3e', emoji: '★' },
+  { id: 'pingap',   name: 'PinGap / Affiliate',color: '#5a7a3a', emoji: '✧' },
+  { id: 'bgc',      name: 'BGC / Counseling',  color: '#6a4a7a', emoji: '❀' },
+  { id: 'social',   name: 'Social / Entrewives',color:'#c97a3b', emoji: '♦' },
+  { id: 'content',  name: 'Content Creation',  color: '#3b7ba8', emoji: '◈' },
+  { id: 'kids',     name: 'Kids AI Business',  color: '#b88a3e', emoji: '☀' },
+  { id: 'wedding',  name: 'Wedding (Oct)',     color: '#a84a2b', emoji: '♥' },
+  { id: 'family',   name: 'Home / Meals / Family', color: '#5a7a3a', emoji: '✚' },
+  { id: 'body',     name: 'Body / Hormones',   color: '#c97a3b', emoji: '◯' },
+  { id: 'biohack',  name: 'Home Biohacking',   color: '#5a7a3a', emoji: '✿' },
+  { id: 'meals',    name: 'Meal System',       color: '#a84a2b', emoji: '◉' },
+  { id: 'style',    name: 'Style / Shopping',  color: '#6a4a7a', emoji: '◇' },
+  { id: 'friends',  name: 'Friends / Connection', color: '#3b7ba8', emoji: '◐' },
+  { id: 'money',    name: 'Personal Finance',  color: '#15243a', emoji: '$' },
+  { id: 'learn',    name: 'Continued Education',color:'#6a4a7a', emoji: '✎' },
+];
+
+const SEED_TASKS = [
+  // ========== $4M HOME (the why) ==========
+  { area: 'house', text: 'Pull credit reports — both spouses (annualcreditreport.com)', p: 1, due: offsetDate(2) },
+  { area: 'house', text: 'Open + read Hendrickson_Credit_Roadmap.docx with Cody', p: 1, due: offsetDate(3) },
+  { area: 'house', text: 'Set up auto-pay on every bill (credit foundation)', p: 1, due: offsetDate(7) },
+  { area: 'house', text: 'No new credit applications — verbal commit with Cody', p: 1, due: offsetDate(1) },
+  { area: 'house', text: 'Plan August vehicle purchase timing around FICO build', p: 2, due: offsetDate(60) },
+  { area: 'house', text: 'Refill emergency fund to $50K floor before down-payment fund', p: 2, due: offsetDate(90) },
+  { area: 'house', text: 'Build Income Engine doc (after first franchise/Luna DFY win)', p: 3, due: offsetDate(60) },
+  { area: 'house', text: 'Build Savings Architecture doc (HYSA/T-bills/tax/float)', p: 3, due: offsetDate(45) },
+  { area: 'house', text: 'Build Mortgage Prep doc — self-employed lender research', p: 3, due: offsetDate(120) },
+  { area: 'house', text: 'Build Cody-version of dashboard once mine is dialed', p: 3, due: offsetDate(30) },
+
+  // ========== MOVE (May 17 hard) ==========
+  { area: 'move', text: '🔥 Lease signed by May 10 (full week buffer before move)', p: 1, due: offsetDate(14) },
+  { area: 'move', text: 'Track Cody\'s lead list — which options are alive vs dead', p: 1, due: offsetDate(3) },
+  { area: 'move', text: 'PLAN B: if no lease by May 13, identify temp housing', p: 1, due: offsetDate(17) },
+  { area: 'move', text: 'Reserve U-haul (size + date) once address is known', p: 2, due: offsetDate(14) },
+  { area: 'move', text: 'Sort + label by room — start one box/day', p: 1, due: offsetDate(3) },
+  { area: 'move', text: 'Pack non-essentials', p: 2, due: offsetDate(18) },
+  { area: 'move', text: 'Transfer utilities (power, water, internet) to new address', p: 2, due: offsetDate(18) },
+  { area: 'move', text: 'Change address: USPS, banks, insurance, school records', p: 2, due: offsetDate(18) },
+  { area: 'move', text: 'Move day prep: kids\' jobs assigned, food/water/breaks planned', p: 2, due: offsetDate(20) },
+
+  // ========== LUNA / BRIDGE BUILD ==========
+  { area: 'luna', text: 'Enable HCP API access + get production keys', p: 1, due: offsetDate(1) },
+  { area: 'luna', text: 'Build API bridge: GHL → bridge → HCP (this week)', p: 1, due: offsetDate(7) },
+  { area: 'luna', text: 'Verify zone routing: 7 zones → correct tech availability', p: 1, due: offsetDate(8) },
+  { area: 'luna', text: 'Test escalation chain: Trinet → Jesse → Cody (FL)', p: 1, due: offsetDate(10) },
+  { area: 'luna', text: 'Hand bridge to Cody + Trinet for live testing', p: 1, due: offsetDate(10) },
+  { area: 'luna', text: 'Launch Luna + zone calendar — May 3 (HARD DATE)', p: 1, due: offsetDate(7) },
+  { area: 'luna', text: 'Summer optimization: tweak based on Cody/Trinet feedback', p: 3, due: offsetDate(60) },
+  { area: 'luna', text: 'Add GHL chat widget to new Innovo site (post-rebuild)', p: 2, due: offsetDate(35) },
+
+  // ========== INNOVO (ops + hidden revenue) ==========
+  { area: 'innovo', text: '💰 Subscription recovery campaign — $11K found in 1hr, find rest', p: 1, due: offsetDate(14) },
+  { area: 'innovo', text: '💰 Reactivate delivery service push (peaked at $18K/mo)', p: 2, due: offsetDate(45) },
+  { area: 'innovo', text: 'Hire forensic accountant for stewardship audit', p: 2, due: offsetDate(30) },
+  { area: 'innovo', text: 'Continue hiring + onboarding rotating techs', p: 2, due: offsetDate(30) },
+  { area: 'innovo', text: 'Plan fleet vehicle purchases (capex, AFTER credit build)', p: 3, due: offsetDate(180) },
+  { area: 'innovo', text: 'Website rebuild — paused until franchise rollout', p: 3, due: offsetDate(120) },
+
+  // ========== LUNGO (AI agency) ==========
+  { area: 'lungo', text: 'Lock Luna DFY pricing: setup ($5-15K) + MRR ($500-1500)', p: 2, due: offsetDate(21) },
+  { area: 'lungo', text: 'Build fresh Luna DFY funnel in GHL', p: 2, due: offsetDate(35) },
+  { area: 'lungo', text: 'Watch xAI phone-salesman product — month-out check', p: 3, due: offsetDate(30) },
+  { area: 'lungo', text: 'Target: 10 Luna DFY clients before hiring human salesman', p: 3, due: offsetDate(180) },
+  { area: 'lungo', text: 'Lungo presence: refresh IG / LinkedIn / FB for AI positioning', p: 3, due: offsetDate(45) },
+  { area: 'lungo', text: 'Wind down legacy SEO/GEO clients gracefully', p: 3, due: offsetDate(90) },
+
+  // ========== FRANCHISE ==========
+  { area: 'franchise', text: 'Return to Investor Readiness Workbook with financial figures', p: 2, due: offsetDate(30) },
+  { area: 'franchise', text: 'Follow up with Franchise Creator on FDD status', p: 2, due: offsetDate(7) },
+  { area: 'franchise', text: 'Identify independent attorney for FC document review', p: 2, due: offsetDate(21) },
+  { area: 'franchise', text: 'Day 21 target: first verbal commitment from prospect', p: 2, due: offsetDate(21) },
+  { area: 'franchise', text: 'Day 90 target: 3 signed franchise agreements', p: 3, due: offsetDate(90) },
+
+  // ========== PINGAP / AFFILIATE (pre-revenue, low priority during sprint) ==========
+  { area: 'pingap', text: 'Run PinGap Pro trend scan + queue 5 pins (when bandwidth)', p: 3, due: offsetDate(14) },
+  { area: 'pingap', text: 'Follow up: Thrive Market, Seed, Baloo, Hatch applications', p: 3, due: offsetDate(21) },
+
+  // ========== BGC / COUNSELING ==========
+  { area: 'bgc', text: 'Counseling CE — log this month\'s hours', p: 3, due: offsetDate(20) },
+  { area: 'bgc', text: 'Draft one post for Candle Light Club', p: 3, due: offsetDate(14) },
+
+  // ========== CONTENT / SOCIAL ==========
+  { area: 'content', text: 'Batch content workflow: Opus Clip → Canva → Metricool', p: 3, due: offsetDate(14) },
+  { area: 'social', text: 'Entrewives weekly post + engagement', p: 3, due: offsetDate(7) },
+
+  // ========== KIDS AI BUSINESS (summer prep) ==========
+  { area: 'kids', text: 'Draft summer AI business curriculum (6-week outline)', p: 3, due: offsetDate(35) },
+
+  // ========== WEDDING (Oct - deferred) ==========
+  { area: 'wedding', text: 'Build wedding master timeline doc (after move)', p: 3, due: offsetDate(45) },
+
+  // ========== BIOHACKING (capture only — ideas live here until we build) ==========
+  { area: 'biohack', text: 'Idea: map correct frequencies through the house', p: 3, due: offsetDate(60) },
+  { area: 'biohack', text: 'Idea: add air-purifying / hormone-supportive plants', p: 3, due: offsetDate(60) },
+  { area: 'biohack', text: 'Idea: sprouting station setup (microgreens/sprouts)', p: 3, due: offsetDate(60) },
+  { area: 'biohack', text: 'Idea: red light therapy — research + acquire', p: 3, due: offsetDate(60) },
+  { area: 'biohack', text: 'Project: remove plastics from kitchen + bathrooms', p: 3, due: offsetDate(60) },
+  { area: 'biohack', text: 'Project: identify + remove hormone disruptors (cleaning, beauty)', p: 3, due: offsetDate(60) },
+  { area: 'biohack', text: 'Plan: hormone rebalance protocol with a real practitioner', p: 3, due: offsetDate(45) },
+  { area: 'biohack', text: 'Move-in opportunity: build new home with all this from day 1', p: 2, due: offsetDate(30) },
+
+  // ========== MEALS ==========
+  { area: 'meals', text: 'Build meal prep system (interview Claude — 20 min when rested)', p: 2, due: offsetDate(14) },
+  { area: 'meals', text: 'Decide approach: full meal prep service / batch cook / hybrid', p: 3, due: offsetDate(14) },
+
+  // ========== STYLE ==========
+  { area: 'style', text: 'Build style/shopping system (interview Claude — 20 min)', p: 3, due: offsetDate(21) },
+
+  // ========== FRIENDS / CONNECTION ==========
+  { area: 'friends', text: 'Set up birthdays calendar — friends + family', p: 3, due: offsetDate(14) },
+  { area: 'friends', text: 'Track: borrowed FROM friends (return list)', p: 3, due: offsetDate(7) },
+  { area: 'friends', text: 'Track: loaned TO friends (recovery list)', p: 3, due: offsetDate(7) },
+  { area: 'friends', text: 'Promises made: backlog sweep — what did I commit to?', p: 3, due: offsetDate(14) },
+
+  // ========== FAMILY / BODY / MONEY / LEARN ==========
+  { area: 'family', text: 'Plan meals for the week (Sunday)', p: 3, due: offsetDate(5) },
+  { area: 'body', text: '3 workouts this week (strength focus)', p: 3, due: offsetDate(7) },
+  { area: 'money', text: 'Weekly budget check-in', p: 3, due: offsetDate(6) },
+  { area: 'learn', text: '30 min focused reading / course', p: 3, due: offsetDate(7) },
+];
+
+const DEFAULT_HABITS = [
+  { text: 'Morning: Bible + coffee (no phone first)', history: {} },
+  { text: 'Protein before caffeine', history: {} },
+  { text: 'Move body 20+ min', history: {} },
+  { text: 'Close laptop by 8pm', history: {} },
+  { text: 'Top 3 written before noise', history: {} },
+];
+
+const DEFAULT_DEADLINES = [
+  { title: 'Pull credit reports (both spouses)', date: offsetDate(2, true) },
+  { title: '🔥 Lease signed — buffer date', date: offsetDate(14, true) },
+  { title: '🔥 Lease PLAN B trigger date', date: offsetDate(17, true) },
+  { title: 'Luna + Bridge LAUNCH (hard date)', date: offsetISO(2026, 5, 3) },
+  { title: 'Move out of current home', date: offsetISO(2026, 5, 17) },
+  { title: 'Franchise Day 21: first verbal commitment', date: offsetDate(21, true) },
+  { title: 'August vehicle purchase window', date: offsetISO(2026, 8, 1) },
+  { title: 'Franchise Day 90: 3 signed agreements', date: offsetDate(90, true) },
+  { title: 'Former client wedding', date: offsetISO(2026, 10, 15) },
+  { title: 'Sprint home target (13mo, flexible)', date: offsetISO(2027, 6, 1) },
+];
+
+const ANCHORS = [
+  'Be still, and know. — Psalm 46:10',
+  'Commit your work to the Lord, and your plans will be established. — Prov 16:3',
+  'She laughs without fear of the future. — Prov 31:25',
+  'One thing I ask of the Lord, this is what I seek. — Psalm 27:4',
+  'Sufficient for the day is its own trouble. — Matt 6:34',
+  'Trust in the Lord with all your heart. — Prov 3:5',
+  'For we walk by faith, not by sight. — 2 Cor 5:7',
+  'Let your gentleness be evident to all. — Phil 4:5',
+  'The Lord will fight for you; you need only be still. — Ex 14:14',
+  'Whatever you do, work heartily, as for the Lord. — Col 3:23',
+  'A good man leaves an inheritance to his children\'s children. — Prov 13:22',
+  'Train up a child in the way he should go. — Prov 22:6',
+  'Behold, children are a heritage from the Lord. — Psalm 127:3',
+  'The plans of the diligent lead surely to abundance. — Prov 21:5',
+  'She considers a field and buys it. — Prov 31:16',
+];
+
+function offsetDate(days, iso) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  if (iso) return d.toISOString().slice(0,10);
+  return d.toISOString().slice(0,10);
+}
+function offsetISO(y, m, d) {
+  return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+
+/* ================================================================
+   STORAGE (sessionStorage-safe via in-memory fallback)
+   ================================================================ */
+const memStore = {};
+function save() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+  catch(e) { memStore[LS_KEY] = JSON.stringify(state); }
+}
+function load() {
+  try {
+    const raw = localStorage.getItem(LS_KEY) || memStore[LS_KEY];
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return null;
+}
+
+function freshState() {
+  return {
+    version: 3,
+    created: new Date().toISOString(),
+    priorities: [
+      { text: '', done: false, note: 'Luna · biggest needle mover' },
+      { text: '', done: false, note: 'Move · one concrete step' },
+      { text: '', done: false, note: 'Anything else (work / personal)' },
+    ],
+    avoiding: '',
+    win: '',
+    anchor: ANCHORS[new Date().getDate() % ANCHORS.length],
+    tasks: SEED_TASKS.map((t, i) => ({ id: `t${i}_${Date.now()}`, ...t, done: false })),
+    brain: [],
+    habits: DEFAULT_HABITS,
+    deadlines: DEFAULT_DEADLINES,
+    optimizers: [],
+    lastBriefDate: null,
+  };
+}
+
+let state = load() || freshState();
+// migrate / backfill
+if (!state.habits) state.habits = DEFAULT_HABITS;
+if (!state.deadlines) state.deadlines = DEFAULT_DEADLINES;
+if (!state.brain) state.brain = [];
+if (!state.priorities) state.priorities = freshState().priorities;
+if (!state.anchor) state.anchor = ANCHORS[0];
+if (!state.optimizers) state.optimizers = [];
+
+// v2 migration: add $4M Home area tasks if upgrading from v1
+if (state.tasks && !state.tasks.some(t => t.area === 'house')) {
+  const houseSeeds = SEED_TASKS.filter(t => t.area === 'house');
+  houseSeeds.forEach((t, i) => {
+    state.tasks.push({ id: `house_${i}_${Date.now()}`, ...t, done: false });
+  });
+  if (!state.deadlines.some(d => d.title.toLowerCase().includes('credit reports'))) {
+    state.deadlines.push({ title: 'Pull credit reports (both spouses)', date: offsetDate(2, true) });
+  }
+  save();
+}
+
+// v2 migration: rename old 'home' area to 'family' if present
+if (state.tasks) {
+  state.tasks.forEach(t => { if (t.area === 'home') t.area = 'family'; });
+  save();
+}
+
+// v3 migration: merge old 'ai' area into 'lungo'
+if (state.tasks) {
+  state.tasks.forEach(t => { if (t.area === 'ai') t.area = 'lungo'; });
+  save();
+}
+
+// v3 migration: refresh seed tasks if version is older
+if (!state.version || state.version < 3) {
+  // Mark old seeded tasks as legacy (don't delete user's manual additions)
+  // Add any v3 seed tasks that don't exist yet by text match
+  const existingTexts = new Set(state.tasks.map(t => t.text));
+  SEED_TASKS.forEach((t, i) => {
+    if (!existingTexts.has(t.text)) {
+      state.tasks.push({ id: `v3_${i}_${Date.now()}`, ...t, done: false });
+    }
+  });
+  state.version = 3;
+  save();
+}
+
+/* ================================================================
+   RENDER
+   ================================================================ */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+function fmtDateLong(d) {
+  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+}
+function fmtDateShort(d) {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+function daysUntil(iso) {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const target = new Date(iso + 'T00:00:00');
+  return Math.round((target - now) / 86400000);
+}
+function areaById(id) { return DEFAULT_AREAS.find(a => a.id === id) || { name: id, color: '#666', emoji: '•'}; }
+
+function renderMasthead() {
+  const now = new Date();
+  $('#today-date').textContent = fmtDateLong(now);
+  const shortEl = document.getElementById('today-date-short');
+  if (shortEl) shortEl.textContent = now.toLocaleDateString('en-US', { weekday: 'long' }) + ' · ' + now.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+  const start = new Date(state.created);
+  const n = Math.max(1, Math.round((now - start) / 86400000) + 1);
+  $('#day-num').textContent = n;
+}
+
+function renderPriorities() {
+  const ul = $('#priorities'); ul.innerHTML = '';
+  state.priorities.forEach((p, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div class="priority-num">${i+1}</div>
+      <div class="check ${p.done?'done':''}" data-i="${i}"></div>
+      <div class="priority-body ${p.done?'done':''}">
+        <input type="text" class="t" data-i="${i}" value="${escapeAttr(p.text)}" placeholder="${escapeAttr(p.note||'')}" />
+        <div class="m">${p.note||''}</div>
+      </div>
+    `;
+    ul.appendChild(li);
+  });
+  ul.querySelectorAll('.check').forEach(c => c.addEventListener('click', e => {
+    const i = +e.target.dataset.i;
+    state.priorities[i].done = !state.priorities[i].done;
+    save(); renderPriorities(); renderStatus(); renderBrief();
+  }));
+  ul.querySelectorAll('input.t').forEach(inp => inp.addEventListener('input', e => {
+    const i = +e.target.dataset.i;
+    state.priorities[i].text = e.target.value;
+    save(); renderBrief(); renderStatus();
+  }));
+}
+
+function escapeAttr(s) { return (s||'').replaceAll('"','&quot;'); }
+function escapeHtml(s) { return (s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function renderStatus() {
+  const doneCount = state.priorities.filter(p => p.done && p.text).length;
+  const totalSet = state.priorities.filter(p => p.text).length;
+  $('#s-done').textContent = `${doneCount}/${Math.max(3,totalSet)}`;
+  const weekOpen = state.tasks.filter(t => !t.done && daysUntil(t.due) <= 7).length;
+  $('#s-week').textContent = weekOpen;
+  $('#s-brain').textContent = state.brain.length;
+  $('#brain-count').textContent = state.brain.length;
+}
+
+function renderCountdowns() {
+  const wrap = $('#countdowns'); wrap.innerHTML = '';
+  const items = [...state.deadlines].sort((a,b) => a.date.localeCompare(b.date));
+
+  items.forEach(d => {
+    const n = daysUntil(d.date);
+    if (n < -1) return;
+    const cls = n <= 3 ? 'urgent' : (n <= 14 ? 'near' : '');
+    const row = document.createElement('div');
+    row.className = `cd ${cls}`;
+    row.innerHTML = `
+      <div>
+        <div class="label">${escapeHtml(d.title)}</div>
+        <span class="sub">${new Date(d.date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
+      </div>
+      <div class="days">${n === 0 ? 'Today' : (n < 0 ? `${Math.abs(n)}d past` : `${n}d`)}</div>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+function renderAnchor() {
+  $('#anchor-verse').textContent = state.anchor;
+}
+
+function todayKey() { return new Date().toISOString().slice(0,10); }
+
+function renderTodayRituals() {
+  const ul = $('#today-rituals'); ul.innerHTML = '';
+  const tk = todayKey();
+  state.habits.forEach((h, i) => {
+    const done = !!h.history[tk];
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div class="check ${done?'done':''}" data-i="${i}"></div>
+      <div class="tcontent">
+        <div class="${done?'done':''}" style="${done?'color:var(--ink-faint);text-decoration:line-through;':''}">${escapeHtml(h.text)}</div>
+      </div>
+    `;
+    ul.appendChild(li);
+  });
+  ul.querySelectorAll('.check').forEach(c => c.addEventListener('click', e => {
+    const i = +e.target.dataset.i;
+    const tk2 = todayKey();
+    if (state.habits[i].history[tk2]) delete state.habits[i].history[tk2];
+    else state.habits[i].history[tk2] = true;
+    save(); renderTodayRituals(); renderHabits(); renderBrief();
+  }));
+}
+
+function renderHabits() {
+  const wrap = $('#habits-grid'); wrap.innerHTML = '';
+  // last 7 days week grid per habit
+  const days = [];
+  for (let i=6;i>=0;i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    days.push({ iso: d.toISOString().slice(0,10), label: d.toLocaleDateString('en-US',{weekday:'short'})[0], dn: d.getDate() });
+  }
+  state.habits.forEach((h, idx) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.marginBottom = '14px';
+    const grid = days.map(d => {
+      const hit = !!h.history[d.iso];
+      const today = d.iso === todayKey();
+      return `<div class="day ${hit?'hit':''} ${today?'today':''}" data-hidx="${idx}" data-iso="${d.iso}">${d.label}<span class="dn">${d.dn}</span></div>`;
+    }).join('');
+    const total = Object.keys(h.history).length;
+    card.innerHTML = `
+      <div class="row-between">
+        <div>
+          <div class="kicker">Ritual</div>
+          <div style="font-family:'Fraunces',serif;font-size:19px;">${escapeHtml(h.text)}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'Fraunces',serif;font-size:24px;">${total}</div>
+          <div class="muted" style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.14em;">Total days</div>
+        </div>
+      </div>
+      <div class="weekgrid">${grid}</div>
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <button class="btn-ghost" data-act="edit" data-i="${idx}">Edit</button>
+        <button class="btn-ghost" data-act="delete" data-i="${idx}">Delete</button>
+      </div>
+    `;
+    wrap.appendChild(card);
+  });
+  wrap.querySelectorAll('.day').forEach(d => d.addEventListener('click', e => {
+    const idx = +e.currentTarget.dataset.hidx;
+    const iso = e.currentTarget.dataset.iso;
+    if (state.habits[idx].history[iso]) delete state.habits[idx].history[iso];
+    else state.habits[idx].history[iso] = true;
+    save(); renderHabits(); renderTodayRituals();
+  }));
+  wrap.querySelectorAll('button[data-act="edit"]').forEach(b => b.addEventListener('click', e => {
+    const i = +e.target.dataset.i;
+    const name = prompt('Rename ritual:', state.habits[i].text);
+    if (name !== null && name.trim()) { state.habits[i].text = name.trim(); save(); renderHabits(); renderTodayRituals(); }
+  }));
+  wrap.querySelectorAll('button[data-act="delete"]').forEach(b => b.addEventListener('click', e => {
+    const i = +e.target.dataset.i;
+    if (confirm(`Delete ritual "${state.habits[i].text}"?`)) { state.habits.splice(i,1); save(); renderHabits(); renderTodayRituals(); }
+  }));
+}
+
+function renderDeadlines() {
+  const wrap = $('#deadlines-body'); wrap.innerHTML = '';
+  const items = [...state.deadlines].sort((a,b) => a.date.localeCompare(b.date));
+  if (items.length === 0) { wrap.innerHTML = '<p class="muted">No deadlines yet.</p>'; return; }
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = '<ul class="tasklist">' + items.map((d, i) => {
+    const n = daysUntil(d.date);
+    const nstr = n === 0 ? 'Today' : (n < 0 ? `${Math.abs(n)}d past` : `in ${n}d`);
+    const cls = n < 0 ? 'pill p1' : (n <= 7 ? 'pill p1' : (n <= 21 ? 'pill p2' : 'pill p3'));
+    return `
+      <li>
+        <div class="tcontent">
+          <input class="ttext" value="${escapeAttr(d.title)}" data-dlidx="${i}" data-field="title" />
+          <div class="tmeta">
+            <span class="${cls}">${nstr}</span>
+            <input type="date" value="${d.date}" data-dlidx="${i}" data-field="date" />
+          </div>
+        </div>
+        <button class="tx" data-dldel="${i}">×</button>
+      </li>
+    `;
+  }).join('') + '</ul>';
+  wrap.appendChild(card);
+  wrap.querySelectorAll('input[data-dlidx]').forEach(inp => inp.addEventListener('input', e => {
+    const i = +e.target.dataset.dlidx;
+    const f = e.target.dataset.field;
+    // find index in original
+    const sorted = [...state.deadlines].sort((a,b) => a.date.localeCompare(b.date));
+    const target = sorted[i];
+    const origIdx = state.deadlines.indexOf(target);
+    state.deadlines[origIdx][f] = e.target.value;
+    save(); renderCountdowns();
+  }));
+  wrap.querySelectorAll('button[data-dldel]').forEach(b => b.addEventListener('click', e => {
+    const i = +e.target.dataset.dldel;
+    const sorted = [...state.deadlines].sort((a,b) => a.date.localeCompare(b.date));
+    const target = sorted[i];
+    if (confirm(`Delete "${target.title}"?`)) {
+      state.deadlines.splice(state.deadlines.indexOf(target), 1);
+      save(); renderDeadlines(); renderCountdowns();
+    }
+  }));
+}
+
+/* ---- Tasks: week view + areas view ---- */
+function taskRow(t) {
+  const area = areaById(t.area);
+  const n = daysUntil(t.due);
+  const dueLabel = n === 0 ? 'Today' : (n < 0 ? `${Math.abs(n)}d past` : `in ${n}d`);
+  const pClass = t.p === 1 ? 'p1' : (t.p === 2 ? 'p2' : 'p3');
+  return `
+    <li class="${t.done?'done':''}">
+      <div class="check ${t.done?'done':''}" data-tid="${t.id}" data-act="toggle"></div>
+      <div class="tcontent">
+        <input class="ttext" value="${escapeAttr(t.text)}" data-tid="${t.id}" data-field="text" />
+        <div class="tmeta">
+          <span class="pill ${pClass}">${t.p === 1 ? 'P1' : t.p === 2 ? 'P2' : 'P3'}</span>
+          <select data-tid="${t.id}" data-field="p">
+            <option value="1" ${t.p===1?'selected':''}>P1 urgent</option>
+            <option value="2" ${t.p===2?'selected':''}>P2 important</option>
+            <option value="3" ${t.p===3?'selected':''}>P3 later</option>
+          </select>
+          <input type="date" value="${t.due}" data-tid="${t.id}" data-field="due" />
+          <span>${dueLabel}</span>
+          <select data-tid="${t.id}" data-field="area">
+            ${DEFAULT_AREAS.map(a => `<option value="${a.id}" ${t.area===a.id?'selected':''}>${a.emoji} ${a.name}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <button class="tx" data-tid="${t.id}" data-act="del">×</button>
+    </li>
+  `;
+}
+
+function wireTaskHandlers(scope) {
+  scope.querySelectorAll('[data-act="toggle"]').forEach(el => el.addEventListener('click', e => {
+    const id = e.target.dataset.tid;
+    const t = state.tasks.find(x => x.id === id);
+    t.done = !t.done; save(); renderWeek(); renderAreas(); renderStatus(); renderBrief();
+  }));
+  scope.querySelectorAll('[data-act="del"]').forEach(el => el.addEventListener('click', e => {
+    const id = e.target.dataset.tid;
+    if (confirm('Delete this task?')) {
+      state.tasks = state.tasks.filter(x => x.id !== id);
+      save(); renderWeek(); renderAreas(); renderStatus();
+    }
+  }));
+  scope.querySelectorAll('input[data-field], select[data-field]').forEach(el => el.addEventListener('input', e => {
+    const id = e.target.dataset.tid;
+    const f = e.target.dataset.field;
+    const t = state.tasks.find(x => x.id === id);
+    let v = e.target.value;
+    if (f === 'p') v = +v;
+    t[f] = v; save();
+    if (f !== 'text') { renderWeek(); renderAreas(); renderStatus(); renderBrief(); }
+  }));
+}
+
+let weekFilter = 'all';
+function renderWeek() {
+  const body = $('#week-body'); body.innerHTML = '';
+  let tasks = state.tasks.filter(t => !t.done);
+  if (weekFilter === 'p1') tasks = tasks.filter(t => t.p === 1);
+  else if (weekFilter === 'p2') tasks = tasks.filter(t => t.p === 2);
+  else if (weekFilter === 'p3') tasks = tasks.filter(t => t.p === 3);
+  else if (weekFilter === 'overdue') tasks = tasks.filter(t => daysUntil(t.due) < 0);
+  else if (weekFilter === 'week') tasks = tasks.filter(t => { const n = daysUntil(t.due); return n >= 0 && n <= 7; });
+
+  tasks.sort((a,b) => {
+    const na = daysUntil(a.due), nb = daysUntil(b.due);
+    if (a.p !== b.p) return a.p - b.p;
+    return na - nb;
+  });
+
+  if (tasks.length === 0) {
+    body.innerHTML = '<div class="card"><p class="muted">Nothing matches this filter. Go touch grass.</p></div>';
+    return;
+  }
+
+  // group by area
+  const byArea = {};
+  tasks.forEach(t => { (byArea[t.area] = byArea[t.area] || []).push(t); });
+
+  DEFAULT_AREAS.forEach(a => {
+    if (!byArea[a.id]) return;
+    const head = document.createElement('div');
+    head.className = 'area-head';
+    head.innerHTML = `<span style="color:${a.color}">${a.emoji}</span> ${a.name} <span class="c">${byArea[a.id].length}</span>`;
+    body.appendChild(head);
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.marginBottom = '10px';
+    card.innerHTML = `<ul class="tasklist">${byArea[a.id].map(taskRow).join('')}</ul>`;
+    body.appendChild(card);
+  });
+
+  wireTaskHandlers(body);
+}
+
+let areaFilter = 'luna';
+function renderAreaTabs() {
+  const wrap = $('#area-tabs'); wrap.innerHTML = '';
+  const label = document.createElement('span');
+  label.className = 'flabel';
+  label.textContent = 'Area:';
+  wrap.appendChild(label);
+  DEFAULT_AREAS.forEach(a => {
+    const c = document.createElement('span');
+    c.className = 'chip' + (a.id === areaFilter ? ' active' : '');
+    c.textContent = `${a.emoji} ${a.name}`;
+    c.style.borderColor = a.color;
+    if (a.id === areaFilter) c.style.background = a.color;
+    c.addEventListener('click', () => { areaFilter = a.id; renderAreaTabs(); renderAreas(); });
+    wrap.appendChild(c);
+  });
+}
+
+function renderAreas() {
+  const body = $('#area-body'); body.innerHTML = '';
+  const a = areaById(areaFilter);
+  const tasks = state.tasks.filter(t => t.area === areaFilter);
+  const open = tasks.filter(t => !t.done).sort((x,y) => x.p - y.p);
+  const done = tasks.filter(t => t.done);
+
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="row-between">
+      <div>
+        <div class="kicker">Area</div>
+        <h2 class="h" style="color:${a.color};">${a.emoji} ${a.name}</h2>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'Fraunces',serif;font-size:24px;">${open.length}</div>
+        <div class="muted" style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.14em;">Open tasks</div>
+      </div>
+    </div>
+
+    <ul class="tasklist">${open.map(taskRow).join('')}</ul>
+
+    <div class="addrow">
+      <input id="new-task-input" placeholder="Add task to ${escapeHtml(a.name)}..." />
+      <button id="new-task-btn">Add</button>
+    </div>
+
+    ${done.length > 0 ? `
+      <details style="margin-top:22px;">
+        <summary class="kicker" style="cursor:pointer;">Completed (${done.length})</summary>
+        <ul class="tasklist" style="margin-top:8px;">${done.map(taskRow).join('')}</ul>
+      </details>
+    ` : ''}
+  `;
+  body.appendChild(card);
+
+  wireTaskHandlers(body);
+  const input = card.querySelector('#new-task-input');
+  const btn = card.querySelector('#new-task-btn');
+  const addNow = () => {
+    const v = input.value.trim();
+    if (!v) return;
+    state.tasks.push({
+      id: 't' + Date.now(),
+      area: areaFilter,
+      text: v,
+      p: 2,
+      due: offsetDate(7),
+      done: false,
+    });
+    input.value = '';
+    save(); renderAreas(); renderWeek(); renderStatus();
+  };
+  btn.addEventListener('click', addNow);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') addNow(); });
+}
+
+/* ---- Brain dump ---- */
+function renderBrain() {
+  const wrap = $('#brain-entries'); wrap.innerHTML = '';
+  if (state.brain.length === 0) {
+    wrap.innerHTML = '<p class="muted">Nothing captured yet. Start dumping.</p>';
+    return;
+  }
+  [...state.brain].reverse().forEach((b, i) => {
+    const actualIdx = state.brain.length - 1 - i;
+    const d = new Date(b.time);
+    const entry = document.createElement('div');
+    entry.className = 'brain-entry';
+    entry.innerHTML = `
+      <div class="stamp">
+        <span>${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})} · ${d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</span>
+        <div>
+          <button class="btn-ghost" data-brain-task="${actualIdx}" style="padding:2px 8px;font-size:9px;">→ Task</button>
+          <button class="del" data-brain-del="${actualIdx}">×</button>
+        </div>
+      </div>
+      <div>${escapeHtml(b.text)}</div>
+    `;
+    wrap.appendChild(entry);
+  });
+  wrap.querySelectorAll('[data-brain-del]').forEach(b => b.addEventListener('click', e => {
+    const i = +e.target.dataset.brainDel;
+    state.brain.splice(i,1); save(); renderBrain(); renderStatus();
+  }));
+  wrap.querySelectorAll('[data-brain-task]').forEach(b => b.addEventListener('click', e => {
+    const i = +e.target.dataset.brainTask;
+    const text = state.brain[i].text;
+    const areaName = prompt('Which area? Type one:\n\n' + DEFAULT_AREAS.map(a => a.id).join(', '), 'luna');
+    if (!areaName) return;
+    const area = DEFAULT_AREAS.find(a => a.id === areaName.toLowerCase().trim()) ? areaName.toLowerCase().trim() : 'luna';
+    state.tasks.push({ id: 't'+Date.now(), area, text: text.slice(0,200), p: 2, due: offsetDate(7), done: false });
+    state.brain.splice(i,1); save(); renderBrain(); renderWeek(); renderAreas(); renderStatus();
+    alert('Added to ' + area);
+  }));
+}
+
+/* ---- Morning brief ---- */
+function renderBrief() {
+  const d = new Date();
+  $('#brief-date').textContent = fmtDateLong(d);
+
+  const priorities = state.priorities.filter(p => p.text).map((p,i) => `  ${i+1}. ${p.done?'✓ ':''}${p.text}${p.note?' ['+p.note+']':''}`).join('\n') || '  (not set — go to Today tab and fill in your three)';
+
+  const cds = [...state.deadlines]
+    .map(x => ({...x, n: daysUntil(x.date)}))
+    .filter(x => x.n >= -1 && x.n <= 30)
+    .sort((a,b) => a.n - b.n)
+    .slice(0, 5)
+    .map(x => `  · ${x.title} — ${x.n === 0 ? 'TODAY' : x.n < 0 ? Math.abs(x.n)+'d past' : 'in '+x.n+' days'}`)
+    .join('\n') || '  · Nothing in next 30 days';
+
+  const weekTasks = state.tasks
+    .filter(t => !t.done && daysUntil(t.due) <= 7)
+    .sort((a,b) => a.p - b.p || daysUntil(a.due) - daysUntil(b.due))
+    .slice(0, 8);
+
+  const p1Count = weekTasks.filter(t => t.p === 1).length;
+
+  const tk = todayKey();
+  const ritualsDone = state.habits.filter(h => h.history[tk]).length;
+
+  const brainRecent = state.brain.slice(-3).reverse().map(b => `  · ${b.text.slice(0,90)}${b.text.length>90?'…':''}`).join('\n');
+
+  const brief = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  MORNING BRIEF · ${fmtDateShort(d).toUpperCase()}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+▸ THE WHY
+  The house. L, A, E.
+  Today's work is income engine work — or it isn't.
+
+▸ THE THREE
+${priorities}
+
+▸ ANCHOR
+  "${state.anchor}"
+
+▸ WHAT'S COMING (next 30d)
+${cds}
+
+▸ THIS WEEK · ${weekTasks.length} open${p1Count?' · '+p1Count+' P1':''}
+${weekTasks.map(t => `  · [${t.p===1?'P1':t.p===2?'P2':'P3'}] ${t.text} — ${areaById(t.area).name}`).join('\n') || '  · Clear.'}
+
+▸ RITUALS TODAY
+  ${ritualsDone}/${state.habits.length} complete
+
+▸ AVOIDING
+  ${state.avoiding || '(not named yet)'}
+
+▸ YESTERDAY'S WIN
+  ${state.win || '(capture one)'}
+
+${brainRecent ? `▸ FROM BRAIN DUMP
+${brainRecent}\n` : ''}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  One step at a time. You've got this.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+
+  const el = $('#brief-text');
+  const btn = el.querySelector('.copybtn');
+  el.textContent = brief;
+  el.appendChild(btn);
+}
+
+/* ================================================================
+   WIRING
+   ================================================================ */
+function switchTab(name) {
+  $$('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  $$('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-'+name));
+  if (name === 'brief') renderBrief();
+  if (name === 'week') renderWeek();
+  if (name === 'areas') { renderAreaTabs(); renderAreas(); }
+  if (name === 'habits') renderHabits();
+  if (name === 'deadlines') renderDeadlines();
+  if (name === 'brain') renderBrain();
+  if (name === 'sunday') renderSunday();
+  if (name === 'optimizers') renderOptimizers();
+}
+
+function renderOptimizers() {
+  const wrap = $('#opt-body'); if (!wrap) return;
+  wrap.innerHTML = '';
+  $('#opt-count').textContent = state.optimizers.length;
+  if (state.optimizers.length === 0) {
+    wrap.innerHTML = '<div class="card"><p class="muted">Empty for now. Drop ideas here as they pop into your head.</p></div>';
+    return;
+  }
+  // group by tag
+  const tagNames = { biohack: 'Home Biohacking', meals: 'Meals', style: 'Style', family: 'Family', friends: 'Friends', body: 'Body', house: 'House Goal', other: 'Other' };
+  const groups = {};
+  state.optimizers.forEach((o, i) => {
+    const t = o.tag || 'other';
+    (groups[t] = groups[t] || []).push({...o, idx: i});
+  });
+  Object.keys(tagNames).forEach(tag => {
+    if (!groups[tag]) return;
+    const head = document.createElement('div');
+    head.className = 'area-head';
+    head.innerHTML = `${tagNames[tag]} <span class="c">${groups[tag].length}</span>`;
+    wrap.appendChild(head);
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.marginBottom = '10px';
+    card.innerHTML = '<ul class="tasklist">' + groups[tag].map(o => `
+      <li>
+        <div class="tcontent">
+          <input class="ttext" value="${escapeAttr(o.text)}" data-optidx="${o.idx}" />
+          <div class="tmeta">
+            <span class="muted">added ${new Date(o.time).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
+            <button class="btn-ghost" data-opt-promote="${o.idx}" style="padding:2px 8px;font-size:9px;">→ Make a task</button>
+          </div>
+        </div>
+        <button class="tx" data-opt-del="${o.idx}">×</button>
+      </li>
+    `).join('') + '</ul>';
+    wrap.appendChild(card);
+  });
+  wrap.querySelectorAll('input[data-optidx]').forEach(inp => inp.addEventListener('input', e => {
+    const i = +e.target.dataset.optidx;
+    state.optimizers[i].text = e.target.value;
+    save();
+  }));
+  wrap.querySelectorAll('button[data-opt-del]').forEach(b => b.addEventListener('click', e => {
+    const i = +e.target.dataset.optDel;
+    state.optimizers.splice(i, 1);
+    save(); renderOptimizers();
+  }));
+  wrap.querySelectorAll('button[data-opt-promote]').forEach(b => b.addEventListener('click', e => {
+    const i = +e.target.dataset.optPromote;
+    const o = state.optimizers[i];
+    const areaMap = { biohack: 'biohack', meals: 'meals', style: 'style', family: 'family', friends: 'friends', body: 'body', house: 'house', other: 'family' };
+    const area = areaMap[o.tag] || 'family';
+    state.tasks.push({ id: 't'+Date.now(), area, text: o.text, p: 3, due: offsetDate(14), done: false });
+    state.optimizers.splice(i, 1);
+    save(); renderOptimizers(); renderWeek(); renderAreas(); renderStatus();
+    alert('Promoted to task in ' + area);
+  }));
+}
+
+function renderSunday() {
+  // Render the area pulse list
+  const wrap = $('#sweep-areas'); if (!wrap) return;
+  wrap.innerHTML = '';
+  if (!state.sunday) state.sunday = {};
+  DEFAULT_AREAS.forEach(a => {
+    const open = state.tasks.filter(t => t.area === a.id && !t.done).length;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line-soft);';
+    row.innerHTML = `
+      <span style="font-family:'Fraunces',serif;color:${a.color};min-width:18px;">${a.emoji}</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-soft);min-width:140px;">${escapeHtml(a.name)}</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-faint);min-width:36px;">${open} open</span>
+      <input type="text" data-sweep-area="${a.id}" placeholder="Next move? Or 'no move'" value="${escapeAttr(state.sunday[a.id] || '')}" style="flex:1;border:none;background:transparent;border-bottom:1px dashed var(--line);font-family:inherit;font-size:13px;padding:4px 0;outline:none;color:var(--ink);" />
+    `;
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll('input[data-sweep-area]').forEach(inp => {
+    inp.addEventListener('input', e => {
+      state.sunday[e.target.dataset.sweepArea] = e.target.value;
+      save();
+    });
+  });
+}
+$$('#tabs button').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+
+$('#avoiding').value = state.avoiding || '';
+$('#win').value = state.win || '';
+$('#avoiding').addEventListener('input', e => { state.avoiding = e.target.value; save(); renderBrief(); });
+$('#win').addEventListener('input', e => { state.win = e.target.value; save(); renderBrief(); });
+
+$('#new-verse').addEventListener('click', () => {
+  const next = ANCHORS[(ANCHORS.indexOf(state.anchor) + 1) % ANCHORS.length];
+  state.anchor = next; save(); renderAnchor(); renderBrief();
+});
+
+$('#reset-today').addEventListener('click', () => {
+  if (!confirm('Clear today\'s 3 priorities, avoiding, and win? (tasks + rituals stay)')) return;
+  state.priorities = freshState().priorities;
+  state.avoiding = ''; state.win = '';
+  save();
+  $('#avoiding').value = ''; $('#win').value = '';
+  renderPriorities(); renderStatus(); renderBrief();
+});
+
+$('#brain-save').addEventListener('click', () => {
+  const v = $('#brain-input').value.trim();
+  if (!v) return;
+  state.brain.push({ time: new Date().toISOString(), text: v });
+  $('#brain-input').value = '';
+  save(); renderBrain(); renderStatus(); renderBrief();
+});
+$('#brain-input').addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); $('#brain-save').click(); }
+});
+$('#brain-to-task').addEventListener('click', () => {
+  if (state.brain.length === 0) return alert('Nothing in brain dump yet.');
+  const latest = state.brain[state.brain.length - 1];
+  const areaName = prompt('Which area for: "'+latest.text.slice(0,60)+'"?\n\nOptions:\n' + DEFAULT_AREAS.map(a => a.id).join(', '), 'luna');
+  if (!areaName) return;
+  const area = DEFAULT_AREAS.find(a => a.id === areaName.toLowerCase().trim()) ? areaName.toLowerCase().trim() : 'luna';
+  state.tasks.push({ id: 't'+Date.now(), area, text: latest.text.slice(0,200), p: 2, due: offsetDate(7), done: false });
+  state.brain.pop();
+  save(); renderBrain(); renderWeek(); renderAreas(); renderStatus();
+});
+
+$('#add-habit').addEventListener('click', () => {
+  const v = $('#new-habit').value.trim();
+  if (!v) return;
+  state.habits.push({ text: v, history: {} });
+  $('#new-habit').value = '';
+  save(); renderHabits(); renderTodayRituals();
+});
+
+$('#dl-add').addEventListener('click', () => {
+  const t = $('#dl-title').value.trim();
+  const d = $('#dl-date').value;
+  if (!t || !d) return alert('Title and date required');
+  state.deadlines.push({ title: t, date: d });
+  $('#dl-title').value = ''; $('#dl-date').value = '';
+  save(); renderDeadlines(); renderCountdowns();
+});
+
+// Optimizer wiring
+const optAdd = $('#opt-add');
+if (optAdd) optAdd.addEventListener('click', () => {
+  const v = $('#opt-input').value.trim();
+  if (!v) return;
+  const tag = $('#opt-tag').value;
+  state.optimizers.push({ time: new Date().toISOString(), text: v, tag });
+  $('#opt-input').value = '';
+  save(); renderOptimizers();
+});
+const optInput = $('#opt-input');
+if (optInput) optInput.addEventListener('keydown', e => { if (e.key === 'Enter') optAdd.click(); });
+
+// Sunday Sweep wiring
+const sweepSave = $('#sweep-save');
+if (sweepSave) sweepSave.addEventListener('click', () => {
+  const v = $('#sweep-dump').value.trim();
+  if (!v) return;
+  state.brain.push({ time: new Date().toISOString(), text: '[Sunday sweep] ' + v });
+  $('#sweep-dump').value = '';
+  save(); renderBrain(); renderStatus();
+  alert('Saved to brain dump.');
+});
+const sweepClear = $('#sweep-clear');
+if (sweepClear) sweepClear.addEventListener('click', () => { $('#sweep-dump').value = ''; });
+const sweepGo = $('#sweep-go-today');
+if (sweepGo) sweepGo.addEventListener('click', () => switchTab('today'));
+const sweepWeekThing = $('#sweep-week-thing');
+if (sweepWeekThing) sweepWeekThing.addEventListener('change', e => {
+  const v = e.target.value.trim();
+  if (!v) return;
+  state.brain.push({ time: new Date().toISOString(), text: '[don\'t forget this week] ' + v });
+  e.target.value = '';
+  save(); renderBrain(); renderStatus();
+  alert('Added.');
+});
+
+$('#copy-brief').addEventListener('click', async () => {
+  const text = $('#brief-text').textContent.replace('Copy','').trim();
+  try { await navigator.clipboard.writeText(text); $('#copy-brief').textContent = 'Copied ✓'; setTimeout(() => $('#copy-brief').textContent = 'Copy', 1500); }
+  catch(e) { alert('Copy failed. Select manually.'); }
+});
+
+$('#week-filter').addEventListener('click', e => {
+  if (!e.target.classList.contains('chip')) return;
+  weekFilter = e.target.dataset.filter;
+  $('#week-filter').querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.filter === weekFilter));
+  renderWeek();
+});
+
+$('#export-data').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `samantha-command-center-${todayKey()}.json`; a.click();
+  URL.revokeObjectURL(url);
+});
+$('#import-data').addEventListener('click', () => {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'application/json';
+  inp.addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!confirm('This will REPLACE all current data. Continue?')) return;
+    const text = await file.text();
+    try { state = JSON.parse(text); save(); renderAll(); alert('Imported.'); }
+    catch(err) { alert('Invalid file.'); }
+  });
+  inp.click();
+});
+
+/* ================================================================
+   INIT
+   ================================================================ */
+function renderAll() {
+  renderMasthead();
+  renderPriorities();
+  renderStatus();
+  renderCountdowns();
+  renderAnchor();
+  renderTodayRituals();
+  renderWeek();
+  renderAreaTabs();
+  renderAreas();
+  renderBrain();
+  renderHabits();
+  renderDeadlines();
+  renderBrief();
+  renderOptimizers();
+  $('#avoiding').value = state.avoiding || '';
+  $('#win').value = state.win || '';
+}
+renderAll();
+</script>
+</body>
+</html>
